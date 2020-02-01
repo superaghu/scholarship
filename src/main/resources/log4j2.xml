@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="devAppender" target="SYSTEM_OUT">
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d [%.30t] %c{1.} %p %m%n"/>
+        </Console>
+
+        <RollingFile name="fileAppender" fileName="${sys:application.home}/logs/${sys:application.name}.txt" filePattern="${sys:application.home}/logs/${sys:application.name}-%d{MM-dd-yyyy}-%i.txt">
+            <PatternLayout pattern="DateTime=%d{ISO8601}{GMT} Application=${sys:application.name} Environment=${sys:application.environment} Thread=[%.30t] Logger=%c Type=%p Message=%m%n%ex" alwaysWriteExceptions="false"/>
+            <DefaultRolloverStrategy max="10"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="errorAppender" fileName="${sys:application.home}/logs/errors.txt" filePattern="${sys:application.home}/logs/errors-%d{MM-dd-yyyy}-%i.txt">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="DateTime=%d{ISO8601}{GMT} Type=%p Message=%m%n%ex" alwaysWriteExceptions="false"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <Async name="intAppender">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <AppenderRef ref="fileAppender"/>
+        </Async>
+
+        <Async name="prodAppender">
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            <AppenderRef ref="fileAppender"/>
+        </Async>
+
+    </Appenders>
+    <Loggers>
+        <Logger name="com.rm" level="debug"/>
+        <Root level="warn">
+            <AppenderRef ref="${sys:application.environment}Appender"/>
+            <AppenderRef ref="errorAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
